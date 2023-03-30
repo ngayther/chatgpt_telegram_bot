@@ -1,19 +1,19 @@
-import yaml
-import dotenv
-from pathlib import Path
+from telegram.ext import Updater, CommandHandler
 
-config_dir = Path(__file__).parent.parent.resolve() / "config"
+def start(update, context):
+    context.bot.send_message(chat_id=update.effective_chat.id, text="Hello, I'm your bot.")
 
-# load yaml config
-with open(config_dir / "config.yml", 'r') as f:
-    config_yaml = yaml.safe_load(f)
+def help(update, context):
+    context.bot.send_message(chat_id=update.effective_chat.id, text="This is a help message.")
 
-# load .env config
-config_env = dotenv.dotenv_values(config_dir / "config.env")
+def main():
+    updater = Updater(token='YOUR_BOT_TOKEN_HERE', use_context=True)
+    dispatcher = updater.dispatcher
+    start_handler = CommandHandler('start', start)
+    help_handler = CommandHandler('help', help)
+    dispatcher.add_handler(start_handler)
+    dispatcher.add_handler(help_handler)
+    updater.start_polling()
 
-# config parameters
-telegram_token = config_yaml["telegram_token"]
-openai_api_key = config_yaml["openai_api_key"]
-allowed_telegram_usernames = config_yaml["allowed_telegram_usernames"]
-new_dialog_timeout = config_yaml["new_dialog_timeout"]
-mongodb_uri = f"mongodb://mongo:{config_env['MONGODB_PORT']}"
+if __name__ == '__main__':
+    main()
